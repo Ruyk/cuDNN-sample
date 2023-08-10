@@ -530,7 +530,7 @@ class network_t
         {
             // Choose the best according to the preference
             std::cout << "Testing cudnnGetConvolutionForwardAlgorithm ...\n";
-            checkCUDNN( cudnnGetConvolutionForwardAlgorithm(cudnnHandle,
+/*            checkCUDNN( cudnnGetConvolutionForwardAlgorithm(cudnnHandle,
                                                     srcTensorDesc,
                                                     filterDesc,
                                                     convDesc,
@@ -540,7 +540,8 @@ class network_t
                                                     &algo
                                                     ) );
             std::cout << "Fastest algorithm is Algo " << algo << "\n";
-            convAlgorithm = algo;
+*/
+//            convAlgorithm = CUDNN_CONVOLUTION_FWD_ALGO_DIRECT;;
             // New way of finding the fastest config
             // Setup for findFastest call
             std::cout << "Testing cudnnFindConvolutionForwardAlgorithm ...\n";
@@ -556,6 +557,7 @@ class network_t
                                                      returnedAlgoCount,
                                                      results
                                                    ) );
+	convAlgorithm = results[0].algo;
         for(int algoIndex = 0; algoIndex < *returnedAlgoCount; ++algoIndex){
             printf("^^^^ %s for Algo %d: %f time requiring %llu memory\n", cudnnGetErrorString(results[algoIndex].status), results[algoIndex].algo, results[algoIndex].time, (unsigned long long)results[algoIndex].memory);
         }
@@ -569,6 +571,7 @@ class network_t
                 std::cout << "Using FFT for convolution\n";
             }
         }
+	algo = (cudnnConvolutionFwdAlgo_t)convAlgorithm;
 
         resize(n*c*h*w, dstData);
         size_t sizeInBytes=0;
@@ -803,6 +806,8 @@ int main(int argc, char *argv[])
         displayUsage();
         exit(EXIT_WAIVED); 
     }
+
+    checkCudaErrors(cudaInitDevice(0, 0, 0));
 
     int version = (int)cudnnGetVersion();
     printf("cudnnGetVersion() : %d , CUDNN_VERSION from cudnn.h : %d (%s)\n", version, CUDNN_VERSION, CUDNN_VERSION_STR);

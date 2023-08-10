@@ -113,6 +113,7 @@ endif
 # Debug build flags
 ifeq ($(dbg),1)
       NVCCFLAGS += -g -G
+      CCFLAGS += -g
       BUILD_TYPE := debug
 else
       BUILD_TYPE := release
@@ -142,7 +143,7 @@ LIBRARIES :=
 ################################################################################
 
 # Gencode arguments
-SMS ?= 30 35 50 53
+SMS ?= 50 53 60
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
